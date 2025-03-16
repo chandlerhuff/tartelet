@@ -22,6 +22,7 @@ struct SettingsVirtualMachine<SettingsStoreType: SettingsStore>: VirtualMachineD
 
     let tart: Tart
     let settingsStore: SettingsStoreType
+    let runnerLabels: String?
 
     private var virtualMachine: VirtualMachineDomain.VirtualMachine {
         TartVirtualMachine(tart: tart, vmName: name)

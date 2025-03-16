@@ -27,6 +27,7 @@ struct VirtualMachineSettingsView<SettingsStoreType: SettingsStore & Observable>
                         await refreshVirtualMachines()
                     }
                 }
+                .disabled(settingsStore.webhookPort != nil)
                 VirtualMachineCountPicker(selection: $settingsStore.numberOfVirtualMachines)
                     .disabled(!isSettingsEnabled)
                 Toggle(isOn: $settingsStore.startVirtualMachinesOnLaunch) {

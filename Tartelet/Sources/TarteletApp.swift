@@ -16,13 +16,18 @@ struct TarteletApp: App {
         MenuBarItem(
             settingsStore: Composers.settingsStore,
             fleet: Composers.fleet,
+            fleetWebhook: Composers.fleetWebhook,
             editor: Composers.editor,
             configurationState: ConfigurationState(
                 settingsStore: Composers.settingsStore,
                 virtualMachineSSHCredentialsStore: Composers.virtualMachineSSHCredentialsStore,
                 githubCredentialsStore: Composers.gitHubCredentialsStore
             ),
-            virtualMachineState: VirtualMachineState(fleet: Composers.fleet, editor: Composers.editor)
+            virtualMachineState: VirtualMachineState(
+                fleet: Composers.fleet,
+                fleetWebhook: Composers.fleetWebhook,
+                editor: Composers.editor
+            )
         )
         SettingsScene(
             settingsStore: Composers.settingsStore,

@@ -1,6 +1,6 @@
 import ShellDomain
 
-public struct Tart {
+public final class Tart {
     private let homeProvider: TartHomeProvider
     private let shell: Shell
     private var environment: [String: String]? {
@@ -13,6 +13,10 @@ public struct Tart {
     public init(homeProvider: TartHomeProvider, shell: Shell) {
         self.homeProvider = homeProvider
         self.shell = shell
+    }
+
+    public func pull(sourceName: String) async throws {
+        try await executeCommand(withArguments: ["pull", sourceName])
     }
 
     public func clone(sourceName: String, newName: String) async throws {

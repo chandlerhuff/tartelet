@@ -37,6 +37,9 @@ public final class SSHConnectingVirtualMachine<SSHClientType: SSHClient>: Virtua
     public var canStart: Bool {
         virtualMachine.canStart
     }
+    public var runnerLabels: String? {
+        virtualMachine.runnerLabels
+    }
 
     private let logger: Logger
     private let virtualMachine: VirtualMachine

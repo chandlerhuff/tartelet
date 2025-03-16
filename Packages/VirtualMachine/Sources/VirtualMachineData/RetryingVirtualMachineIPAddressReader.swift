@@ -1,6 +1,6 @@
 import VirtualMachineDomain
 
-public struct RetryingVirtualMachineIPAddressReader: VirtualMachineIPAddressReader {
+public final class RetryingVirtualMachineIPAddressReader: VirtualMachineIPAddressReader {
     public init() {}
 
     public func readIPAddress(of virtualMachine: any VirtualMachine) async throws -> String {

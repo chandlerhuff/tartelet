@@ -11,10 +11,12 @@ public final class TartVirtualMachine: VirtualMachine {
 
     private let tart: Tart
     private let vmName: String
+    public let runnerLabels: String?
 
-    public init(tart: Tart, vmName: String) {
+    public init(tart: Tart, vmName: String, runnerLabels: String? = nil) {
         self.tart = tart
         self.vmName = vmName
+        self.runnerLabels = runnerLabels
     }
 
     public func start() async throws {
@@ -23,7 +25,7 @@ public final class TartVirtualMachine: VirtualMachine {
 
     public func clone(named newName: String) async throws -> VirtualMachine {
         try await tart.clone(sourceName: name, newName: newName)
-        return TartVirtualMachine(tart: tart, vmName: newName)
+        return TartVirtualMachine(tart: tart, vmName: newName, runnerLabels: runnerLabels)
     }
 
     public func delete() async throws {

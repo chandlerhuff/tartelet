@@ -21,6 +21,8 @@ internal enum L10n {
     internal static let githubRunner = L10n.tr("Localizable", "settings.github_runner", fallback: "Runner")
     /// Virtual Machine
     internal static let virtualMachine = L10n.tr("Localizable", "settings.virtual_machine", fallback: "Virtual Machine")
+    /// Webhook
+    internal static let webhook = L10n.tr("Localizable", "settings.webhook", fallback: "Webhook")
     internal enum Documentation {
       /// Find articles on getting started with Tartelet and advanced topics in the documentation.
       internal static let introduction = L10n.tr("Localizable", "settings.documentation.introduction", fallback: "Find articles on getting started with Tartelet and advanced topics in the documentation.")
@@ -154,6 +156,14 @@ internal enum L10n {
         internal static let resetToDefault = L10n.tr("Localizable", "settings.virtual_machine.tart_home.reset_to_default", fallback: "Reset to Default")
         /// Select Folder
         internal static let selectFolder = L10n.tr("Localizable", "settings.virtual_machine.tart_home.select_folder", fallback: "Select Folder")
+      }
+    }
+    internal enum Webhook {
+      /// Webhook Port
+      internal static let port = L10n.tr("Localizable", "settings.webhook.port", fallback: "Webhook Port")
+      internal enum Port {
+        /// Webhook must be publicly accesible and set in Github app settings. Leave blank to disable webhook server.
+        internal static let subtitle = L10n.tr("Localizable", "settings.webhook.port.subtitle", fallback: "Webhook must be publicly accesible and set in Github app settings. Leave blank to disable webhook server.")
       }
     }
   }

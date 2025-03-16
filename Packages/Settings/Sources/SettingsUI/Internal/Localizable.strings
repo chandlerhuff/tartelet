@@ -52,6 +52,10 @@
 "settings.runner_scope.organization" = "Organization";
 "settings.runner_scope.repository" = "Repository";
 
+"settings.webhook" = "Webhook";
+"settings.webhook.port" = "Webhook Port";
+"settings.webhook.port.subtitle" = "Webhook must be publicly accesible and set in Github app settings. Leave blank to disable webhook server.";
+
 "settings.documentation" = "Documentation";
 "settings.documentation.introduction" = "Find articles on getting started with Tartelet and advanced topics in the documentation.";
 "settings.documentation.open_documentation" = "Open Documentation";

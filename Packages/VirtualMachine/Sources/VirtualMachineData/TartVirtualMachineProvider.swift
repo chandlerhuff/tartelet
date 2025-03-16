@@ -1,0 +1,37 @@
+import Foundation
+import LoggingDomain
+import SSHDomain
+import VirtualMachineDomain
+
+public final class TartVirtualMachineProvider<SSHClientType: SSHClient> {
+    private let logger: Logger
+    private let tart: Tart
+    private let sshClient: VirtualMachineSSHClient<SSHClientType>
+
+    public init(logger: Logger, tart: Tart, sshClient: VirtualMachineSSHClient<SSHClientType>) {
+        self.logger = logger
+        self.tart = tart
+        self.sshClient = sshClient
+    }
+}
+
+extension TartVirtualMachineProvider: VirtualMachineProvider {
+    public func createVirtualMachine(
+        imageName: String,
+        name: String,
+        runnerLabels: String?
+    ) async throws -> any VirtualMachine {
+        try await tart.pull(sourceName: imageName)
+        let virtualMachine = try await TartVirtualMachine(
+            tart: tart,
+            vmName: imageName,
+            runnerLabels: runnerLabels
+        ).clone(named: name)
+        let connectingVirutalMachine = SSHConnectingVirtualMachine(
+            logger: logger,
+            virtualMachine: virtualMachine,
+            sshClient: sshClient
+        )
+        return connectingVirutalMachine
+    }
+}

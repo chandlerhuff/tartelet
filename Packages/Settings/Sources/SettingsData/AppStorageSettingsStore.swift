@@ -15,6 +15,7 @@ public final class AppStorageSettingsStore: SettingsStore {
         static let gitHubRunnerLabels = "gitHubRunnerLabels"
         static let gitHubRunnerGroup = "gitHubRunnerGroup"
         static let githubRunnerScope = "githubRunnerScope"
+        static let webhookPort = "webhookPort"
     }
 
     public var applicationUIMode: ApplicationUIMode {
@@ -136,6 +137,17 @@ public final class AppStorageSettingsStore: SettingsStore {
         set {
             withMutation(keyPath: \.githubRunnerScope) {
                 userDefaults.setRawRepresentable(newValue, forKey: AppStorageKey.githubRunnerScope)
+            }
+        }
+    }
+    public var webhookPort: String? {
+        get {
+            access(keyPath: \.webhookPort)
+            return userDefaults.string(forKey: AppStorageKey.webhookPort)
+        }
+        set {
+            withMutation(keyPath: \.webhookPort) {
+                userDefaults.setValue(newValue, forKey: AppStorageKey.webhookPort)
             }
         }
     }

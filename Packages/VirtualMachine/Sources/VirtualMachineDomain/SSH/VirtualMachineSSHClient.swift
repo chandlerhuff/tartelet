@@ -23,7 +23,7 @@ private enum VirtualMachineSSHClientError: LocalizedError, CustomDebugStringConv
     }
 }
 
-public struct VirtualMachineSSHClient<SSHClientType: SSHClient> {
+public final class VirtualMachineSSHClient<SSHClientType: SSHClient> {
     private let logger: Logger
     private let client: SSHClientType
     private let ipAddressReader: VirtualMachineIPAddressReader

@@ -35,6 +35,7 @@ public final class FileLogger: LoggingDomain.Logger {
         self.subsystem = subsystem
         self.daysOfRetention = daysOfRetention
         filenameDateFormatter.dateFormat = "yyyy-MM-dd"
+        print("Logs: \(logsDirectory.url.path(percentEncoded: false))")
     }
 
     public func info(_ message: String) {

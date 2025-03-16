@@ -1,6 +1,6 @@
 name: Tartelet
 options:
-  bundleIdPrefix: dk.shape
+  bundleIdPrefix: com.BluDesign
   developmentLanguage: en
 configs:
   Debug: debug
@@ -25,7 +25,7 @@ targets:
       - package: FileSystem
         products: [FileSystemData, FileSystemDomain]
       - package: GitHub
-        products: [GitHubData, GitHubDomain]
+        products: [GitHubData, GitHubDomain, WebhookServer]
       - package: Keychain
         products: Keychain
       - package: Logging
