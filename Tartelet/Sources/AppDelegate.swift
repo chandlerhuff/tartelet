@@ -22,7 +22,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     isInsecure: Composers.settingsStore.insecurePull
                 )
             } else {
-                Composers.fleet.start(numberOfMachines: Composers.settingsStore.numberOfVirtualMachines)
+                Composers.fleet.start(
+                    numberOfMachines: Composers.settingsStore.numberOfVirtualMachines,
+                    isInsecure: Composers.settingsStore.insecurePull
+                )
             }
         }
 

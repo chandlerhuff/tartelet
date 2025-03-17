@@ -95,7 +95,7 @@ private extension MenuBarItem {
         ) { action in
             switch action {
             case .startFleet:
-                fleet.start(numberOfMachines: settingsStore.numberOfVirtualMachines)
+                fleet.start(numberOfMachines: settingsStore.numberOfVirtualMachines, isInsecure: settingsStore.insecurePull)
             case .startFleetWebhook:
                 fleetWebhook.start(
                     numberOfMachines: settingsStore.numberOfVirtualMachines,

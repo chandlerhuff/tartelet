@@ -59,7 +59,6 @@ public final class WebhookServer {
                 guard let string else {
                     return .init(statusCode: .ok)
                 }
-                print("New Request: \(string)")
                 let webhookResponse = try decoder.decode(WebhookResponse.self, from: bodyData)
                 let workflowJob = WorkflowJob(
                     id: webhookResponse.workflow_job.id,
@@ -68,7 +67,6 @@ public final class WebhookServer {
                 )
                 workflowJobSubject.send(workflowJob)
             } catch {
-                print("Error: \(error)")
                 throw error
             }
             return .init(statusCode: .ok)

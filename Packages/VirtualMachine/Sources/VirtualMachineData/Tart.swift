@@ -25,8 +25,14 @@ public final class Tart {
         try await executeCommand(withArguments: arguments)
     }
 
-    public func clone(sourceName: String, newName: String) async throws {
-        try await executeCommand(withArguments: ["clone", sourceName, newName])
+    public func clone(sourceName: String, newName: String, isInsecure: Bool) async throws {
+        let arguments: [String]
+        if isInsecure {
+            arguments = ["clone", sourceName, newName, "--insecure"]
+        } else {
+            arguments = ["clone", sourceName, newName]
+        }
+        try await executeCommand(withArguments: arguments)
     }
 
     public func run(name: String) async throws {

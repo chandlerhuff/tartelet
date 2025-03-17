@@ -41,6 +41,7 @@ public final class VirtualMachineFleetWebhook {
 
     @MainActor
     public func start(numberOfMachines: Int, gitHubRunnerLabels: String, webhookPort: Int?, isInsecure: Bool) {
+        self.isInsecure = isInsecure
         guard let webhookPort else {
             logger.error("Starting without webhook port")
             return

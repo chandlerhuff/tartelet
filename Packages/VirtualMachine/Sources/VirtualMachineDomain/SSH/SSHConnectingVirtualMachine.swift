@@ -92,8 +92,8 @@ public final class SSHConnectingVirtualMachine<SSHClientType: SSHClient>: Virtua
         }
     }
 
-    public func clone(named newName: String) async throws -> VirtualMachine {
-        let virtualMachine = try await virtualMachine.clone(named: newName)
+    public func clone(named newName: String, isInsecure: Bool) async throws -> VirtualMachine {
+        let virtualMachine = try await virtualMachine.clone(named: newName, isInsecure: isInsecure)
         return SSHConnectingVirtualMachine(
             logger: logger,
             virtualMachine: virtualMachine,

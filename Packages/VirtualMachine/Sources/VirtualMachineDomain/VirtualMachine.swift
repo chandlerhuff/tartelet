@@ -5,7 +5,7 @@ public protocol VirtualMachine {
     var canStart: Bool { get }
     var runnerLabels: String? { get }
     func start() async throws
-    func clone(named newName: String) async throws -> VirtualMachine
+    func clone(named newName: String, isInsecure: Bool) async throws -> VirtualMachine
     func delete() async throws
     func getIPAddress() async throws -> String
 }

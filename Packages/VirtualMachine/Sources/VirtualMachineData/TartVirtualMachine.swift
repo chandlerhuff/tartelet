@@ -23,8 +23,8 @@ public final class TartVirtualMachine: VirtualMachine {
         try await tart.run(name: vmName)
     }
 
-    public func clone(named newName: String) async throws -> VirtualMachine {
-        try await tart.clone(sourceName: name, newName: newName)
+    public func clone(named newName: String, isInsecure: Bool) async throws -> VirtualMachine {
+        try await tart.clone(sourceName: name, newName: newName, isInsecure: isInsecure)
         return TartVirtualMachine(tart: tart, vmName: newName, runnerLabels: runnerLabels)
     }
 

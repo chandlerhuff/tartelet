@@ -27,7 +27,7 @@ extension TartVirtualMachineProvider: VirtualMachineProvider {
             tart: tart,
             vmName: imageName,
             runnerLabels: runnerLabels
-        ).clone(named: name)
+        ).clone(named: name, isInsecure: isInsecure)
         let connectingVirutalMachine = SSHConnectingVirtualMachine(
             logger: logger,
             virtualMachine: virtualMachine,

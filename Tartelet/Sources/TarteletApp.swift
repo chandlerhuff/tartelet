@@ -46,6 +46,7 @@ struct TarteletApp: App {
                 fileSystem: DiskFileSystem()
             ),
             fleet: Composers.fleet,
+            fleetWebhook: Composers.fleetWebhook,
             editor: Composers.editor
         )
     }

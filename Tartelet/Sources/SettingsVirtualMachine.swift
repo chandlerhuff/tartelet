@@ -32,8 +32,8 @@ struct SettingsVirtualMachine<SettingsStoreType: SettingsStore>: VirtualMachineD
         try await virtualMachine.start()
     }
 
-    func clone(named newName: String) async throws -> VirtualMachineDomain.VirtualMachine {
-        try await virtualMachine.clone(named: newName)
+    func clone(named newName: String, isInsecure: Bool) async throws -> VirtualMachineDomain.VirtualMachine {
+        try await virtualMachine.clone(named: newName, isInsecure: isInsecure)
     }
 
     func delete() async throws {

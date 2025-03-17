@@ -15,7 +15,7 @@ public final class VirtualMachineFleet {
         self.baseVirtualMachine = baseVirtualMachine
     }
 
-    public func start(numberOfMachines: Int) {
+    public func start(numberOfMachines: Int, isInsecure: Bool) {
         guard !isStarted else {
             return
         }
@@ -25,7 +25,7 @@ public final class VirtualMachineFleet {
         isStarted = true
         for index in 0 ..< numberOfMachines {
             let name = baseVirtualMachine.name + "-\(index + 1)"
-            startSequentiallyRunningVirtualMachines(named: name)
+            startSequentiallyRunningVirtualMachines(named: name, isInsecure: isInsecure)
         }
     }
 
@@ -47,11 +47,11 @@ public final class VirtualMachineFleet {
 }
 
 private extension VirtualMachineFleet {
-    private func startSequentiallyRunningVirtualMachines(named name: String) {
+    private func startSequentiallyRunningVirtualMachines(named name: String, isInsecure: Bool) {
         let task = Task {
             while !Task.isCancelled {
                 do {
-                    let virtualMachine = try await baseVirtualMachine.clone(named: name)
+                    let virtualMachine = try await baseVirtualMachine.clone(named: name, isInsecure: isInsecure)
                     try await runVirtualMachine(virtualMachine)
                     if isStopping {
                         activeTasks[name]?.cancel()
