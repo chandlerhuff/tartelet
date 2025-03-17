@@ -35,8 +35,14 @@ public final class Tart {
         try await executeCommand(withArguments: arguments)
     }
 
-    public func run(name: String) async throws {
-        try await executeCommand(withArguments: ["run", name])
+    public func run(name: String, netBridgedAdapter: String?) async throws {
+        let arguments: [String]
+        if let netBridgedAdapter {
+            arguments = ["run", name, "--net-bridged=\(netBridgedAdapter)"]
+        } else {
+            arguments = ["run", name]
+        }
+        try await executeCommand(withArguments: arguments)
     }
 
     public func delete(name: String) async throws {

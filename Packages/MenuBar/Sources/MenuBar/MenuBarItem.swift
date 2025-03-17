@@ -95,19 +95,24 @@ private extension MenuBarItem {
         ) { action in
             switch action {
             case .startFleet:
-                fleet.start(numberOfMachines: settingsStore.numberOfVirtualMachines, isInsecure: settingsStore.insecurePull)
+                fleet.start(
+                    numberOfMachines: settingsStore.numberOfVirtualMachines,
+                    isInsecure: settingsStore.insecurePull,
+                    netBridgedAdapter: settingsStore.netBridgedAdapter
+                )
             case .startFleetWebhook:
                 fleetWebhook.start(
                     numberOfMachines: settingsStore.numberOfVirtualMachines,
                     gitHubRunnerLabels: settingsStore.gitHubRunnerLabels,
                     webhookPort: settingsStore.webhookPort.flatMap { Int($0) },
-                    isInsecure: settingsStore.insecurePull
+                    isInsecure: settingsStore.insecurePull,
+                    netBridgedAdapter: settingsStore.netBridgedAdapter
                 )
             case .stopFleet:
                 fleet.stop()
                 fleetWebhook.stop()
             case .startEditor:
-                editor.start()
+                editor.start(netBridgedAdapter: settingsStore.netBridgedAdapter)
             }
         }
     }

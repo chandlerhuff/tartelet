@@ -19,6 +19,7 @@ public final class VirtualMachineFleetWebhook {
     private var numberOfMachines = 0
     private var gitHubRunnerLabels: String?
     private var isInsecure = false
+    private var netBridgedAdapter: String?
     private var cancellables = Set<AnyCancellable>()
 
     public init(logger: Logger, webhookServer: WebhookServer, virtualMachineProvider: VirtualMachineProvider) {
@@ -40,8 +41,9 @@ public final class VirtualMachineFleetWebhook {
     }
 
     @MainActor
-    public func start(numberOfMachines: Int, gitHubRunnerLabels: String, webhookPort: Int?, isInsecure: Bool) {
+    public func start(numberOfMachines: Int, gitHubRunnerLabels: String, webhookPort: Int?, isInsecure: Bool, netBridgedAdapter: String?) {
         self.isInsecure = isInsecure
+        self.netBridgedAdapter = netBridgedAdapter
         guard let webhookPort else {
             logger.error("Starting without webhook port")
             return
@@ -105,7 +107,7 @@ private extension VirtualMachineFleetWebhook {
                     runnerLabels: runnerLabels,
                     isInsecure: isInsecure
                 )
-                try await runVirtualMachine(virtualMachine)
+                try await runVirtualMachine(virtualMachine, netBridgedAdapter: netBridgedAdapter)
                 activeTasks.removeValue(forKey: workflowJob)
             } catch {
                 logger.error(error.localizedDescription)
@@ -116,11 +118,11 @@ private extension VirtualMachineFleetWebhook {
         activeTasks[workflowJob] = task
     }
 
-    func runVirtualMachine(_ virtualMachine: VirtualMachine) async throws {
+    func runVirtualMachine(_ virtualMachine: VirtualMachine, netBridgedAdapter: String?) async throws {
         try await withTaskCancellationHandler {
             logger.info("Start virtual machine named \(virtualMachine.name)")
             do {
-                try await virtualMachine.start()
+                try await virtualMachine.start(netBridgedAdapter: netBridgedAdapter)
                 logger.info("Did stop virtual machine named \(virtualMachine.name)")
                 do {
                     try await virtualMachine.delete()

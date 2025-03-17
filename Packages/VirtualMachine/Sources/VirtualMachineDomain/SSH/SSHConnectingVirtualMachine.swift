@@ -55,10 +55,10 @@ public final class SSHConnectingVirtualMachine<SSHClientType: SSHClient>: Virtua
         self.sshClient = sshClient
     }
 
-    public func start() async throws {
+    public func start(netBridgedAdapter: String?) async throws {
         try await withThrowingTaskGroup(of: StartVirtualMachineResult.self) { group in
             group.addTask {
-                return try await self.startVirtualMachine()
+                return try await self.startVirtualMachine(netBridgedAdapter: netBridgedAdapter)
             }
             group.addTask {
                 return try await self.connect(to: self.virtualMachine)
@@ -111,9 +111,9 @@ public final class SSHConnectingVirtualMachine<SSHClientType: SSHClient>: Virtua
 }
 
 private extension SSHConnectingVirtualMachine {
-    private func startVirtualMachine() async throws -> StartVirtualMachineResult {
+    private func startVirtualMachine(netBridgedAdapter: String?) async throws -> StartVirtualMachineResult {
         do {
-            try await self.virtualMachine.start()
+            try await self.virtualMachine.start(netBridgedAdapter: netBridgedAdapter)
             return .success(.virtualMachineTerminated)
         } catch {
             if error is CancellationError {

@@ -28,8 +28,8 @@ struct SettingsVirtualMachine<SettingsStoreType: SettingsStore>: VirtualMachineD
         TartVirtualMachine(tart: tart, vmName: name)
     }
 
-    func start() async throws {
-        try await virtualMachine.start()
+    func start(netBridgedAdapter: String?) async throws {
+        try await virtualMachine.start(netBridgedAdapter: netBridgedAdapter)
     }
 
     func clone(named newName: String, isInsecure: Bool) async throws -> VirtualMachineDomain.VirtualMachine {

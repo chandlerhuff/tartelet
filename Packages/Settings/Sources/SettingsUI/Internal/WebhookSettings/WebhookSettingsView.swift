@@ -9,6 +9,7 @@ struct WebhookSettingsView<SettingsStoreType: SettingsStore & Observable>: View 
     let isSettingsEnabled: Bool
 
     @State private var webhookPort = ""
+    @State private var netBridgedAdapter = ""
 
     var body: some View {
         Form {
@@ -20,11 +21,14 @@ struct WebhookSettingsView<SettingsStoreType: SettingsStore & Observable>: View 
                     Text(L10n.Settings.Webhook.insecurePulls)
                 }
                 .disabled(!isSettingsEnabled)
+                TextField(L10n.Settings.Webhook.netBridgedAdapter, text: $netBridgedAdapter)
+                    .disabled(!isSettingsEnabled)
             }
         }
         .formStyle(.grouped)
         .onAppear {
             webhookPort = settingsStore.webhookPort ?? ""
+            netBridgedAdapter = settingsStore.netBridgedAdapter ?? ""
         }
         .onChange(of: webhookPort) { _, newValue in
             guard !newValue.isEmpty, Int(newValue) != nil else {
@@ -32,6 +36,13 @@ struct WebhookSettingsView<SettingsStoreType: SettingsStore & Observable>: View 
                 return
             }
             settingsStore.webhookPort = newValue
+        }
+        .onChange(of: netBridgedAdapter) { _, newValue in
+            guard !newValue.isEmpty else {
+                settingsStore.netBridgedAdapter = nil
+                return
+            }
+            settingsStore.netBridgedAdapter = newValue
         }
     }
 }

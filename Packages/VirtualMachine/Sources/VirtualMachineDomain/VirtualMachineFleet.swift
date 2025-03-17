@@ -15,7 +15,7 @@ public final class VirtualMachineFleet {
         self.baseVirtualMachine = baseVirtualMachine
     }
 
-    public func start(numberOfMachines: Int, isInsecure: Bool) {
+    public func start(numberOfMachines: Int, isInsecure: Bool, netBridgedAdapter: String?) {
         guard !isStarted else {
             return
         }
@@ -25,7 +25,7 @@ public final class VirtualMachineFleet {
         isStarted = true
         for index in 0 ..< numberOfMachines {
             let name = baseVirtualMachine.name + "-\(index + 1)"
-            startSequentiallyRunningVirtualMachines(named: name, isInsecure: isInsecure)
+            startSequentiallyRunningVirtualMachines(named: name, isInsecure: isInsecure, netBridgedAdapter: netBridgedAdapter)
         }
     }
 
@@ -47,12 +47,12 @@ public final class VirtualMachineFleet {
 }
 
 private extension VirtualMachineFleet {
-    private func startSequentiallyRunningVirtualMachines(named name: String, isInsecure: Bool) {
+    private func startSequentiallyRunningVirtualMachines(named name: String, isInsecure: Bool, netBridgedAdapter: String?) {
         let task = Task {
             while !Task.isCancelled {
                 do {
                     let virtualMachine = try await baseVirtualMachine.clone(named: name, isInsecure: isInsecure)
-                    try await runVirtualMachine(virtualMachine)
+                    try await runVirtualMachine(virtualMachine, netBridgedAdapter: netBridgedAdapter)
                     if isStopping {
                         activeTasks[name]?.cancel()
                     }
@@ -72,11 +72,11 @@ private extension VirtualMachineFleet {
         activeTasks[name] = task
     }
 
-    private func runVirtualMachine(_ virtualMachine: VirtualMachine) async throws {
+    private func runVirtualMachine(_ virtualMachine: VirtualMachine, netBridgedAdapter: String?) async throws {
         try await withTaskCancellationHandler {
             logger.info("Start virtual machine named \(virtualMachine.name)")
             do {
-                try await virtualMachine.start()
+                try await virtualMachine.start(netBridgedAdapter: netBridgedAdapter)
                 logger.info("Did stop virtual machine named \(virtualMachine.name)")
                 do {
                     try await virtualMachine.delete()

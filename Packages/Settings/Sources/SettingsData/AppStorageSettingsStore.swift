@@ -17,6 +17,7 @@ public final class AppStorageSettingsStore: SettingsStore {
         static let githubRunnerScope = "githubRunnerScope"
         static let webhookPort = "webhookPort"
         static let insecurePull = "insecurePull"
+        static let netBridgedAdapter = "netBridgedAdapter"
     }
 
     public var applicationUIMode: ApplicationUIMode {
@@ -160,6 +161,17 @@ public final class AppStorageSettingsStore: SettingsStore {
         set {
             withMutation(keyPath: \.insecurePull) {
                 userDefaults.setValue(newValue, forKey: AppStorageKey.insecurePull)
+            }
+        }
+    }
+    public var netBridgedAdapter: String? {
+        get {
+            access(keyPath: \.netBridgedAdapter)
+            return userDefaults.string(forKey: AppStorageKey.netBridgedAdapter)
+        }
+        set {
+            withMutation(keyPath: \.netBridgedAdapter) {
+                userDefaults.setValue(newValue, forKey: AppStorageKey.netBridgedAdapter)
             }
         }
     }
