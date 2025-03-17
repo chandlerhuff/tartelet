@@ -40,7 +40,7 @@ struct SettingsVirtualMachine<SettingsStoreType: SettingsStore>: VirtualMachineD
         try await virtualMachine.delete()
     }
 
-    func getIPAddress() async throws -> String {
-        try await virtualMachine.getIPAddress()
+    func getIPAddress(shouldUseArpResolver: Bool) async throws -> String {
+        try await virtualMachine.getIPAddress(shouldUseArpResolver: shouldUseArpResolver)
     }
 }
