@@ -54,8 +54,14 @@ public final class Tart {
         return result.split(separator: "\n").map(String.init)
     }
 
-    public func getIPAddress(ofVirtualMachineNamed name: String) async throws -> String {
-        let result = try await executeCommand(withArguments: ["ip", name])
+    public func getIPAddress(ofVirtualMachineNamed name: String, shouldUseArpResolver: Bool) async throws -> String {
+        let arguments: [String]
+        if shouldUseArpResolver {
+            arguments = ["ip", "--resolver=arp", name]
+        } else {
+            arguments = ["ip", name]
+        }
+        let result = try await executeCommand(withArguments: arguments)
         return result.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

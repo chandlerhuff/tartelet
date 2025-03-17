@@ -61,7 +61,7 @@ public final class SSHConnectingVirtualMachine<SSHClientType: SSHClient>: Virtua
                 return try await self.startVirtualMachine(netBridgedAdapter: netBridgedAdapter)
             }
             group.addTask {
-                return try await self.connect(to: self.virtualMachine)
+                return try await self.connect(to: self.virtualMachine, shouldUseArpResolver: netBridgedAdapter != nil)
             }
             for try await result in group {
                 switch result {
@@ -105,8 +105,8 @@ public final class SSHConnectingVirtualMachine<SSHClientType: SSHClient>: Virtua
         try await virtualMachine.delete()
     }
 
-    public func getIPAddress() async throws -> String {
-        try await virtualMachine.getIPAddress()
+    public func getIPAddress(shouldUseArpResolver: Bool) async throws -> String {
+        try await virtualMachine.getIPAddress(shouldUseArpResolver: shouldUseArpResolver)
     }
 }
 
@@ -124,9 +124,9 @@ private extension SSHConnectingVirtualMachine {
         }
     }
 
-    private func connect(to virtualMachine: VirtualMachine) async throws -> StartVirtualMachineResult {
+    private func connect(to virtualMachine: VirtualMachine, shouldUseArpResolver: Bool) async throws -> StartVirtualMachineResult {
         do {
-            let connection = try await sshClient.connect(to: virtualMachine)
+            let connection = try await sshClient.connect(to: virtualMachine, shouldUseArpResolver: shouldUseArpResolver)
             try await connection.close()
             return .success(.sshConnectionCompleted)
         } catch {

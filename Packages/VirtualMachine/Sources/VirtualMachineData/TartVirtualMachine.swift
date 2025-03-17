@@ -32,7 +32,7 @@ public final class TartVirtualMachine: VirtualMachine {
         try await tart.delete(name: name)
     }
 
-    public func getIPAddress() async throws -> String {
-        try await tart.getIPAddress(ofVirtualMachineNamed: name)
+    public func getIPAddress(shouldUseArpResolver: Bool) async throws -> String {
+        try await tart.getIPAddress(ofVirtualMachineNamed: name, shouldUseArpResolver: shouldUseArpResolver)
     }
 }
