@@ -15,8 +15,14 @@ public final class Tart {
         self.shell = shell
     }
 
-    public func pull(sourceName: String) async throws {
-        try await executeCommand(withArguments: ["pull", sourceName])
+    public func pull(sourceName: String, isInsecure: Bool) async throws {
+        let arguments: [String]
+        if isInsecure {
+            arguments = ["pull", sourceName, "--insecure"]
+        } else {
+            arguments = ["pull", sourceName]
+        }
+        try await executeCommand(withArguments: arguments)
     }
 
     public func clone(sourceName: String, newName: String) async throws {

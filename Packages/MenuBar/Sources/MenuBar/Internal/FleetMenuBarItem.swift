@@ -35,7 +35,10 @@ private extension FleetMenuBarItem {
              (.readyWebhook, .stoppingFleet),
              (.readyWebhook, .stoppingFleetWebook):
             return L10n.MenuBarItem.VirtualMachines.stopping
-        case (.ready, .fleetStarted), (.readyWebhook, .fleetWebhookStarted):
+        case (.ready, .fleetStarted),
+             (.ready, .fleetWebhookStarted),
+             (.readyWebhook, .fleetStarted),
+             (.readyWebhook, .fleetWebhookStarted):
             return L10n.MenuBarItem.VirtualMachines.stop
         case (.ready, .ready), (.ready, .editorStarted):
             return L10n.MenuBarItem.VirtualMachines.start
@@ -52,7 +55,10 @@ private extension FleetMenuBarItem {
              (.ready, .stoppingFleetWebook),
              (.readyWebhook, .stoppingFleet),
              (.readyWebhook, .stoppingFleetWebook),
-             (.ready, .fleetStarted):
+             (.ready, .fleetStarted),
+             (.ready, .fleetWebhookStarted),
+             (.readyWebhook, .fleetStarted),
+             (.readyWebhook, .fleetWebhookStarted):
             return Image(systemName: "stop.fill")
         case (.ready, .ready), (.ready, .editorStarted), (.readyWebhook, .ready):
             return Image(systemName: "play.fill")
@@ -72,7 +78,7 @@ private extension FleetMenuBarItem {
 
     private var presentSettings: Bool {
         switch configurationState {
-        case .ready:
+        case .ready, .readyWebhook:
             false
         case _:
             true

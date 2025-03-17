@@ -13,4 +13,5 @@ public protocol SettingsStore: AnyObject {
     var gitHubRunnerGroup: String { get set }
     var githubRunnerScope: GitHubRunnerScope { get set }
     var webhookPort: String? { get set }
+    var insecurePull: Bool { get set }
 }

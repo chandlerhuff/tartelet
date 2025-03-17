@@ -38,6 +38,7 @@ struct WebhookResponse: Codable {
 public final class WebhookServer {
     private let decoder = JSONDecoder()
     private let workflowJobSubject = PassthroughSubject<WorkflowJob, Never>()
+    private var server: HTTPServer?
 
     public var workflowJobPublisher: AnyPublisher<WorkflowJob, Never> {
         workflowJobSubject.eraseToAnyPublisher()
@@ -73,5 +74,10 @@ public final class WebhookServer {
             return .init(statusCode: .ok)
         }
         try await server.run()
+    }
+
+    public func stop() async {
+        await server?.stop()
+        server = nil
     }
 }

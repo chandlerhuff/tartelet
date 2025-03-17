@@ -159,6 +159,8 @@ internal enum L10n {
       }
     }
     internal enum Webhook {
+      /// Allow insecure image pulls.
+      internal static let insecurePulls = L10n.tr("Localizable", "settings.webhook.insecurePulls", fallback: "Allow insecure image pulls.")
       /// Webhook Port
       internal static let port = L10n.tr("Localizable", "settings.webhook.port", fallback: "Webhook Port")
       internal enum Port {

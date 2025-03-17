@@ -16,6 +16,10 @@ struct WebhookSettingsView<SettingsStoreType: SettingsStore & Observable>: View 
                 TextField(L10n.Settings.Webhook.port, text: $webhookPort)
                     .disabled(!isSettingsEnabled)
                 Text(L10n.Settings.Webhook.Port.subtitle)
+                Toggle(isOn: $settingsStore.insecurePull) {
+                    Text(L10n.Settings.Webhook.insecurePulls)
+                }
+                .disabled(!isSettingsEnabled)
             }
         }
         .formStyle(.grouped)

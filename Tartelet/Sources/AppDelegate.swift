@@ -18,7 +18,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 Composers.fleetWebhook.start(
                     numberOfMachines: Composers.settingsStore.numberOfVirtualMachines,
                     gitHubRunnerLabels: Composers.settingsStore.gitHubRunnerLabels,
-                    webhookPort: Composers.settingsStore.webhookPort.flatMap { Int($0) }
+                    webhookPort: Composers.settingsStore.webhookPort.flatMap { Int($0) },
+                    isInsecure: Composers.settingsStore.insecurePull
                 )
             } else {
                 Composers.fleet.start(numberOfMachines: Composers.settingsStore.numberOfVirtualMachines)

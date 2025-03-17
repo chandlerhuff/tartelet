@@ -16,6 +16,7 @@ public final class AppStorageSettingsStore: SettingsStore {
         static let gitHubRunnerGroup = "gitHubRunnerGroup"
         static let githubRunnerScope = "githubRunnerScope"
         static let webhookPort = "webhookPort"
+        static let insecurePull = "insecurePull"
     }
 
     public var applicationUIMode: ApplicationUIMode {
@@ -148,6 +149,17 @@ public final class AppStorageSettingsStore: SettingsStore {
         set {
             withMutation(keyPath: \.webhookPort) {
                 userDefaults.setValue(newValue, forKey: AppStorageKey.webhookPort)
+            }
+        }
+    }
+    public var insecurePull: Bool {
+        get {
+            access(keyPath: \.insecurePull)
+            return userDefaults.bool(forKey: AppStorageKey.insecurePull)
+        }
+        set {
+            withMutation(keyPath: \.insecurePull) {
+                userDefaults.setValue(newValue, forKey: AppStorageKey.insecurePull)
             }
         }
     }

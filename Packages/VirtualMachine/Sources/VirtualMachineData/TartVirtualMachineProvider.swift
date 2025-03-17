@@ -19,9 +19,10 @@ extension TartVirtualMachineProvider: VirtualMachineProvider {
     public func createVirtualMachine(
         imageName: String,
         name: String,
-        runnerLabels: String?
+        runnerLabels: String?,
+        isInsecure: Bool
     ) async throws -> any VirtualMachine {
-        try await tart.pull(sourceName: imageName)
+        try await tart.pull(sourceName: imageName, isInsecure: isInsecure)
         let virtualMachine = try await TartVirtualMachine(
             tart: tart,
             vmName: imageName,

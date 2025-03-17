@@ -55,6 +55,7 @@
 "settings.webhook" = "Webhook";
 "settings.webhook.port" = "Webhook Port";
 "settings.webhook.port.subtitle" = "Webhook must be publicly accesible and set in Github app settings. Leave blank to disable webhook server.";
+"settings.webhook.insecurePulls" = "Allow insecure image pulls.";
 
 "settings.documentation" = "Documentation";
 "settings.documentation.introduction" = "Find articles on getting started with Tartelet and advanced topics in the documentation.";

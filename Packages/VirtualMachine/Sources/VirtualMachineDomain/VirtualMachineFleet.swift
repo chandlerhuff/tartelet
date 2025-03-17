@@ -39,6 +39,9 @@ public final class VirtualMachineFleet {
     }
 
     public func stop() {
+        guard isStarted else {
+            return
+        }
         isStopping = true
     }
 }

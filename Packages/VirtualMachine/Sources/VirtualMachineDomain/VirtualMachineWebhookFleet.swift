@@ -6,7 +6,9 @@ import WebhookServer
 
 @Observable
 public final class VirtualMachineFleetWebhook {
+    @MainActor
     public private(set) var isStarted = false
+    @MainActor
     public private(set) var isStopping = false
 
     private let logger: Logger
@@ -16,6 +18,7 @@ public final class VirtualMachineFleetWebhook {
     private var activeTasks: [WorkflowJob: Task<(), Never>] = [:]
     private var numberOfMachines = 0
     private var gitHubRunnerLabels: String?
+    private var isInsecure = false
     private var cancellables = Set<AnyCancellable>()
 
     public init(logger: Logger, webhookServer: WebhookServer, virtualMachineProvider: VirtualMachineProvider) {
@@ -26,14 +29,18 @@ public final class VirtualMachineFleetWebhook {
         webhookServer.workflowJobPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] workflowJob in
-            guard let self, isStarted else {
-                return
+                Task { [weak self] in
+                    guard let self, await isStarted else {
+                        return
+                    }
+                    handleWorkflowJob(workflowJob)
+                }
             }
-            handleWorkflowJob(workflowJob)
-        }.store(in: &cancellables)
+            .store(in: &cancellables)
     }
 
-    public func start(numberOfMachines: Int, gitHubRunnerLabels: String, webhookPort: Int?) {
+    @MainActor
+    public func start(numberOfMachines: Int, gitHubRunnerLabels: String, webhookPort: Int?, isInsecure: Bool) {
         guard let webhookPort else {
             logger.error("Starting without webhook port")
             return
@@ -43,7 +50,7 @@ public final class VirtualMachineFleetWebhook {
         }
         self.numberOfMachines = numberOfMachines
         self.gitHubRunnerLabels = gitHubRunnerLabels
-        logger.info("Running web server on port: \(webhookPort)")
+
         webhookServerTask = Task { [webhookServer] in
             logger.info("Starting web server on port: \(webhookPort)")
             try await webhookServer.run(port: webhookPort)
@@ -52,6 +59,7 @@ public final class VirtualMachineFleetWebhook {
         isStarted = true
     }
 
+    @MainActor
     public func stopImmediately() {
         isStarted = false
         isStopping = false
@@ -62,9 +70,18 @@ public final class VirtualMachineFleetWebhook {
         activeTasks = [:]
     }
 
+    @MainActor
     public func stop() {
-        webhookServerTask?.cancel()
+        guard isStarted else {
+            return
+        }
         isStopping = true
+        Task {
+            await webhookServer.stop()
+            webhookServerTask?.cancel()
+            isStopping = false
+            isStarted = false
+        }
     }
 }
 
@@ -84,7 +101,8 @@ private extension VirtualMachineFleetWebhook {
                 let virtualMachine = try await virtualMachineProvider.createVirtualMachine(
                     imageName: imageName,
                     name: "tartelet-temp-\(count + 1)",
-                    runnerLabels: runnerLabels
+                    runnerLabels: runnerLabels,
+                    isInsecure: isInsecure
                 )
                 try await runVirtualMachine(virtualMachine)
                 activeTasks.removeValue(forKey: workflowJob)

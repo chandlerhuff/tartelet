@@ -37,8 +37,7 @@ public enum ConfigurationState {
                     && (githubCredentialsStore.repositoryName ?? "").isEmpty {
             self = .missingGitHubRepositoryName
         } else if settingsStore.webhookPort != nil {
-//            self = .readyWebhook
-            self = .ready
+            self = .readyWebhook
         } else {
             self = .ready
         }

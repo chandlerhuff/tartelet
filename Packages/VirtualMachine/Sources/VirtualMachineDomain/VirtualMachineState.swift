@@ -6,6 +6,7 @@ public enum VirtualMachineState {
     case stoppingFleetWebook
     case editorStarted
 
+    @MainActor
     public init(fleet: VirtualMachineFleet, fleetWebhook: VirtualMachineFleetWebhook, editor: VirtualMachineEditor) {
         if fleet.isStopping {
             self = .stoppingFleet

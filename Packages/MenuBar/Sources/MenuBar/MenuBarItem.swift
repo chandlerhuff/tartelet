@@ -95,17 +95,13 @@ private extension MenuBarItem {
         ) { action in
             switch action {
             case .startFleet:
-                fleetWebhook.start(
-                    numberOfMachines: settingsStore.numberOfVirtualMachines,
-                    gitHubRunnerLabels: settingsStore.gitHubRunnerLabels,
-                    webhookPort: settingsStore.webhookPort.flatMap { Int($0) }
-                )
-//                fleet.start(numberOfMachines: settingsStore.numberOfVirtualMachines)
+                fleet.start(numberOfMachines: settingsStore.numberOfVirtualMachines)
             case .startFleetWebhook:
                 fleetWebhook.start(
                     numberOfMachines: settingsStore.numberOfVirtualMachines,
                     gitHubRunnerLabels: settingsStore.gitHubRunnerLabels,
-                    webhookPort: settingsStore.webhookPort.flatMap { Int($0) }
+                    webhookPort: settingsStore.webhookPort.flatMap { Int($0) },
+                    isInsecure: settingsStore.insecurePull
                 )
             case .stopFleet:
                 fleet.stop()
