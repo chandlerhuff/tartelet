@@ -20,12 +20,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     gitHubRunnerLabels: Composers.settingsStore.gitHubRunnerLabels,
                     webhookPort: Composers.settingsStore.webhookPort.flatMap { Int($0) },
                     isInsecure: Composers.settingsStore.insecurePull,
+                    isHeadless: Composers.settingsStore.headless,
                     netBridgedAdapter: Composers.settingsStore.netBridgedAdapter
                 )
             } else {
                 Composers.fleet.start(
                     numberOfMachines: Composers.settingsStore.numberOfVirtualMachines,
                     isInsecure: Composers.settingsStore.insecurePull,
+                    isHeadless: Composers.settingsStore.headless,
                     netBridgedAdapter: Composers.settingsStore.netBridgedAdapter
                 )
             }

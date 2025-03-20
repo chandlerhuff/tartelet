@@ -55,10 +55,10 @@ public final class SSHConnectingVirtualMachine<SSHClientType: SSHClient>: Virtua
         self.sshClient = sshClient
     }
 
-    public func start(netBridgedAdapter: String?) async throws {
+    public func start(netBridgedAdapter: String?, isHeadless: Bool) async throws {
         try await withThrowingTaskGroup(of: StartVirtualMachineResult.self) { group in
             group.addTask {
-                return try await self.startVirtualMachine(netBridgedAdapter: netBridgedAdapter)
+                return try await self.startVirtualMachine(netBridgedAdapter: netBridgedAdapter, isHeadless: isHeadless)
             }
             group.addTask {
                 return try await self.connect(to: self.virtualMachine, shouldUseArpResolver: netBridgedAdapter != nil)
@@ -111,9 +111,12 @@ public final class SSHConnectingVirtualMachine<SSHClientType: SSHClient>: Virtua
 }
 
 private extension SSHConnectingVirtualMachine {
-    private func startVirtualMachine(netBridgedAdapter: String?) async throws -> StartVirtualMachineResult {
+    private func startVirtualMachine(
+        netBridgedAdapter: String?,
+        isHeadless: Bool
+    ) async throws -> StartVirtualMachineResult {
         do {
-            try await self.virtualMachine.start(netBridgedAdapter: netBridgedAdapter)
+            try await self.virtualMachine.start(netBridgedAdapter: netBridgedAdapter, isHeadless: isHeadless)
             return .success(.virtualMachineTerminated)
         } catch {
             if error is CancellationError {
@@ -124,7 +127,10 @@ private extension SSHConnectingVirtualMachine {
         }
     }
 
-    private func connect(to virtualMachine: VirtualMachine, shouldUseArpResolver: Bool) async throws -> StartVirtualMachineResult {
+    private func connect(
+        to virtualMachine: VirtualMachine,
+        shouldUseArpResolver: Bool
+    ) async throws -> StartVirtualMachineResult {
         do {
             let connection = try await sshClient.connect(to: virtualMachine, shouldUseArpResolver: shouldUseArpResolver)
             try await connection.close()

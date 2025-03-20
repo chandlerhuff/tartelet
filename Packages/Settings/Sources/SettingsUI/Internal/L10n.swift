@@ -117,6 +117,8 @@ internal enum L10n {
     internal enum VirtualMachine {
       /// Number of Machines
       internal static let count = L10n.tr("Localizable", "settings.virtual_machine.count", fallback: "Number of Machines")
+      /// Headless/No Graphics
+      internal static let headless = L10n.tr("Localizable", "settings.virtual_machine.headless", fallback: "Headless/No Graphics")
       /// Use the Tart CLI to create a virtual machine.
       internal static let noVirtualMachinesAvailable = L10n.tr("Localizable", "settings.virtual_machine.no_virtual_machines_available", fallback: "Use the Tart CLI to create a virtual machine.")
       /// SSH
@@ -166,8 +168,8 @@ internal enum L10n {
       /// Webhook Port
       internal static let port = L10n.tr("Localizable", "settings.webhook.port", fallback: "Webhook Port")
       internal enum Port {
-        /// Webhook must be publicly accesible and set in Github app settings. Leave blank to disable webhook server.
-        internal static let subtitle = L10n.tr("Localizable", "settings.webhook.port.subtitle", fallback: "Webhook must be publicly accesible and set in Github app settings. Leave blank to disable webhook server.")
+        /// Webhook must be publicly accesible and set in Github app settings. Leave blank to disable webhook server. When webhook is enabled set the labels on builds as the VM name to be cloned and the label set in runner settings in this app.
+        internal static let subtitle = L10n.tr("Localizable", "settings.webhook.port.subtitle", fallback: "Webhook must be publicly accesible and set in Github app settings. Leave blank to disable webhook server. When webhook is enabled set the labels on builds as the VM name to be cloned and the label set in runner settings in this app.")
       }
     }
   }

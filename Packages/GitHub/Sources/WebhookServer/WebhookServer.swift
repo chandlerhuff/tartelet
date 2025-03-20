@@ -55,10 +55,6 @@ public final class WebhookServer {
             }
             do {
                 let bodyData = try await request.bodyData
-                let string = String(data: bodyData, encoding: .utf8)
-                guard let string else {
-                    return .init(statusCode: .ok)
-                }
                 let webhookResponse = try decoder.decode(WebhookResponse.self, from: bodyData)
                 let workflowJob = WorkflowJob(
                     id: webhookResponse.workflow_job.id,

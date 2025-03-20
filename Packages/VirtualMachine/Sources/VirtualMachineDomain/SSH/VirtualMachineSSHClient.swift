@@ -44,7 +44,10 @@ public final class VirtualMachineSSHClient<SSHClientType: SSHClient> {
         self.connectionHandler = connectionHandler
     }
 
-    func connect(to virtualMachine: VirtualMachine, shouldUseArpResolver: Bool) async throws -> SSHClientType.SSHConnectionType {
+    func connect(
+        to virtualMachine: VirtualMachine,
+        shouldUseArpResolver: Bool
+    ) async throws -> SSHClientType.SSHConnectionType {
         let ipAddress = try await getIPAddress(of: virtualMachine, shouldUseArpResolver: shouldUseArpResolver)
         let connection = try await connectToVirtualMachine(
             named: virtualMachine.name,
@@ -59,7 +62,10 @@ public final class VirtualMachineSSHClient<SSHClientType: SSHClient> {
 private extension VirtualMachineSSHClient {
     private func getIPAddress(of virtualMachine: VirtualMachine, shouldUseArpResolver: Bool) async throws -> String {
         do {
-            return try await ipAddressReader.readIPAddress(of: virtualMachine, shouldUseArpResolver: shouldUseArpResolver)
+            return try await ipAddressReader.readIPAddress(
+                of: virtualMachine,
+                shouldUseArpResolver: shouldUseArpResolver
+            )
         } catch {
             logger.error(
                 "Failed obtaining IP address of virtual machine named \(virtualMachine.name): "

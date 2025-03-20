@@ -15,4 +15,5 @@ public protocol SettingsStore: AnyObject {
     var webhookPort: String? { get set }
     var insecurePull: Bool { get set }
     var netBridgedAdapter: String? { get set }
+    var headless: Bool { get set }
 }

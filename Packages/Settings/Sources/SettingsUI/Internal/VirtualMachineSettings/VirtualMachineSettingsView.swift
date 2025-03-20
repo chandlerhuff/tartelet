@@ -13,6 +13,7 @@ struct VirtualMachineSettingsView<SettingsStoreType: SettingsStore & Observable>
     @State private var isRefreshingVirtualMachines = false
     @State private var sshUsername = ""
     @State private var sshPassword = ""
+    @State private var netBridgedAdapter = ""
 
     var body: some View {
         Form {
@@ -33,6 +34,12 @@ struct VirtualMachineSettingsView<SettingsStoreType: SettingsStore & Observable>
                 Toggle(isOn: $settingsStore.startVirtualMachinesOnLaunch) {
                     Text(L10n.Settings.VirtualMachine.startVirtualMachinesOnAppLaunch)
                 }
+                Toggle(isOn: $settingsStore.headless) {
+                    Text(L10n.Settings.VirtualMachine.headless)
+                }
+                .disabled(!isSettingsEnabled)
+                TextField(L10n.Settings.Webhook.netBridgedAdapter, text: $netBridgedAdapter)
+                    .disabled(!isSettingsEnabled)
             }
             Section {
                 TextField(
@@ -66,6 +73,7 @@ struct VirtualMachineSettingsView<SettingsStoreType: SettingsStore & Observable>
         .onAppear {
             sshUsername = credentialsStore.username ?? ""
             sshPassword = credentialsStore.password ?? ""
+            netBridgedAdapter = settingsStore.netBridgedAdapter ?? ""
         }
         .onChange(of: settingsStore.tartHomeFolderURL) { _, _ in
             Task {
@@ -85,6 +93,13 @@ struct VirtualMachineSettingsView<SettingsStoreType: SettingsStore & Observable>
             } else {
                 credentialsStore.setPassword(nil)
             }
+        }
+        .onChange(of: netBridgedAdapter) { _, newValue in
+            guard !newValue.isEmpty else {
+                settingsStore.netBridgedAdapter = nil
+                return
+            }
+            settingsStore.netBridgedAdapter = newValue
         }
     }
 }

@@ -3,7 +3,10 @@ import VirtualMachineDomain
 public final class RetryingVirtualMachineIPAddressReader: VirtualMachineIPAddressReader {
     public init() {}
 
-    public func readIPAddress(of virtualMachine: any VirtualMachine, shouldUseArpResolver: Bool) async throws -> String {
+    public func readIPAddress(
+        of virtualMachine: any VirtualMachine,
+        shouldUseArpResolver: Bool
+    ) async throws -> String {
         do {
             try Task.checkCancellation()
             return try await virtualMachine.getIPAddress(shouldUseArpResolver: shouldUseArpResolver)

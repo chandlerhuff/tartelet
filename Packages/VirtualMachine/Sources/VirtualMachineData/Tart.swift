@@ -16,31 +16,28 @@ public final class Tart {
     }
 
     public func pull(sourceName: String, isInsecure: Bool) async throws {
-        let arguments: [String]
+        var arguments: [String] = ["pull", sourceName]
         if isInsecure {
-            arguments = ["pull", sourceName, "--insecure"]
-        } else {
-            arguments = ["pull", sourceName]
+            arguments.append("--insecure")
         }
         try await executeCommand(withArguments: arguments)
     }
 
     public func clone(sourceName: String, newName: String, isInsecure: Bool) async throws {
-        let arguments: [String]
+        var arguments: [String] = ["clone", sourceName, newName]
         if isInsecure {
-            arguments = ["clone", sourceName, newName, "--insecure"]
-        } else {
-            arguments = ["clone", sourceName, newName]
+            arguments.append("--insecure")
         }
         try await executeCommand(withArguments: arguments)
     }
 
-    public func run(name: String, netBridgedAdapter: String?) async throws {
-        let arguments: [String]
+    public func run(name: String, netBridgedAdapter: String?, isHeadless: Bool) async throws {
+        var arguments: [String] = ["run", name]
         if let netBridgedAdapter {
-            arguments = ["run", name, "--net-bridged=\(netBridgedAdapter)"]
-        } else {
-            arguments = ["run", name]
+            arguments.append("--net-bridged=\(netBridgedAdapter)")
+        }
+        if isHeadless {
+            arguments.append("--no-graphics")
         }
         try await executeCommand(withArguments: arguments)
     }

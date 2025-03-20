@@ -19,6 +19,7 @@ public final class VirtualMachineFleetWebhook {
     private var numberOfMachines = 0
     private var gitHubRunnerLabels: String?
     private var isInsecure = false
+    private var isHeadless = false
     private var netBridgedAdapter: String?
     private var cancellables = Set<AnyCancellable>()
 
@@ -41,8 +42,17 @@ public final class VirtualMachineFleetWebhook {
     }
 
     @MainActor
-    public func start(numberOfMachines: Int, gitHubRunnerLabels: String, webhookPort: Int?, isInsecure: Bool, netBridgedAdapter: String?) {
+    // swiftlint:disable:next function_parameter_count
+    public func start(
+        numberOfMachines: Int,
+        gitHubRunnerLabels: String,
+        webhookPort: Int?,
+        isInsecure: Bool,
+        isHeadless: Bool,
+        netBridgedAdapter: String?
+    ) {
         self.isInsecure = isInsecure
+        self.isHeadless = isHeadless
         self.netBridgedAdapter = netBridgedAdapter
         guard let webhookPort else {
             logger.error("Starting without webhook port")
@@ -122,7 +132,7 @@ private extension VirtualMachineFleetWebhook {
         try await withTaskCancellationHandler {
             logger.info("Start virtual machine named \(virtualMachine.name)")
             do {
-                try await virtualMachine.start(netBridgedAdapter: netBridgedAdapter)
+                try await virtualMachine.start(netBridgedAdapter: netBridgedAdapter, isHeadless: isHeadless)
                 logger.info("Did stop virtual machine named \(virtualMachine.name)")
                 do {
                     try await virtualMachine.delete()

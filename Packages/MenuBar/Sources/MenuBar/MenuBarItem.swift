@@ -98,6 +98,7 @@ private extension MenuBarItem {
                 fleet.start(
                     numberOfMachines: settingsStore.numberOfVirtualMachines,
                     isInsecure: settingsStore.insecurePull,
+                    isHeadless: settingsStore.headless,
                     netBridgedAdapter: settingsStore.netBridgedAdapter
                 )
             case .startFleetWebhook:
@@ -106,13 +107,14 @@ private extension MenuBarItem {
                     gitHubRunnerLabels: settingsStore.gitHubRunnerLabels,
                     webhookPort: settingsStore.webhookPort.flatMap { Int($0) },
                     isInsecure: settingsStore.insecurePull,
+                    isHeadless: settingsStore.headless,
                     netBridgedAdapter: settingsStore.netBridgedAdapter
                 )
             case .stopFleet:
                 fleet.stop()
                 fleetWebhook.stop()
             case .startEditor:
-                editor.start(netBridgedAdapter: settingsStore.netBridgedAdapter)
+                editor.start(netBridgedAdapter: settingsStore.netBridgedAdapter, isHeadless: settingsStore.headless)
             }
         }
     }

@@ -19,8 +19,8 @@ public final class TartVirtualMachine: VirtualMachine {
         self.runnerLabels = runnerLabels
     }
 
-    public func start(netBridgedAdapter: String?) async throws {
-        try await tart.run(name: vmName, netBridgedAdapter: netBridgedAdapter)
+    public func start(netBridgedAdapter: String?, isHeadless: Bool) async throws {
+        try await tart.run(name: vmName, netBridgedAdapter: netBridgedAdapter, isHeadless: isHeadless)
     }
 
     public func clone(named newName: String, isInsecure: Bool) async throws -> VirtualMachine {

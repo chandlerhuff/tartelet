@@ -18,6 +18,7 @@ public final class AppStorageSettingsStore: SettingsStore {
         static let webhookPort = "webhookPort"
         static let insecurePull = "insecurePull"
         static let netBridgedAdapter = "netBridgedAdapter"
+        static let headless = "headless"
     }
 
     public var applicationUIMode: ApplicationUIMode {
@@ -172,6 +173,17 @@ public final class AppStorageSettingsStore: SettingsStore {
         set {
             withMutation(keyPath: \.netBridgedAdapter) {
                 userDefaults.setValue(newValue, forKey: AppStorageKey.netBridgedAdapter)
+            }
+        }
+    }
+    public var headless: Bool {
+        get {
+            access(keyPath: \.headless)
+            return userDefaults.bool(forKey: AppStorageKey.headless)
+        }
+        set {
+            withMutation(keyPath: \.headless) {
+                userDefaults.setValue(newValue, forKey: AppStorageKey.headless)
             }
         }
     }
