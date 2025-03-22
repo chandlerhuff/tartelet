@@ -22,7 +22,6 @@ let package = Package(
         .package(path: "../Networking"),
         .package(url: "https://github.com/Kitura/Swift-JWT", from: "4.0.0"),
         .package(url: "https://github.com/swhitty/FlyingFox.git", .upToNextMajor(from: "0.21.0"))
-
     ],
     targets: [
         .target(name: "GitHubData", dependencies: [

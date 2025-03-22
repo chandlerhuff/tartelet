@@ -72,6 +72,25 @@ public final class VirtualMachineFleetWebhook {
         isStarted = true
     }
 
+    // swiftlint:disable:next function_parameter_count
+    public func startCommandLine(
+        numberOfMachines: Int,
+        gitHubRunnerLabels: String,
+        webhookPort: Int,
+        isInsecure: Bool,
+        isHeadless: Bool,
+        netBridgedAdapter: String?
+    ) async throws {
+        self.isInsecure = isInsecure
+        self.isHeadless = isHeadless
+        self.netBridgedAdapter = netBridgedAdapter
+        self.numberOfMachines = numberOfMachines
+        self.gitHubRunnerLabels = gitHubRunnerLabels
+        
+        logger.info("Starting web server on port: \(webhookPort)")
+        try await webhookServer.run(port: webhookPort)
+    }
+
     @MainActor
     public func stopImmediately() {
         isStarted = false
