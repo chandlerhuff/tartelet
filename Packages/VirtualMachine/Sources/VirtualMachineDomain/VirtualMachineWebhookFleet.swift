@@ -166,8 +166,6 @@ private extension VirtualMachineFleetWebhook {
         logger.info("Workflow job: \(workflowJob.id) action: \(workflowJob.action.rawValue) image: \(imageName) isInsecure: \(isJobInsecure)")
 
         switch workflowJob.action {
-        case .waiting:
-            await jobHandler.cancel(workflowJob: workflowJob)
         case .queued:
             let pendingJob = PendingJob(
                 workflowJob: workflowJob,
@@ -177,11 +175,8 @@ private extension VirtualMachineFleetWebhook {
                 isHeadless: isHeadless
             )
             await jobHandler.add(pendingJob: pendingJob)
-        case .inProgress, .unknown:
+        case .waiting, .inProgress, .completed, .unknown:
             break
-        case .completed:
-            await jobHandler.cancel(workflowJob: workflowJob)
         }
-
     }
 }
