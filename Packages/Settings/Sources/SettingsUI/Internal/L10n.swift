@@ -119,6 +119,8 @@ internal enum L10n {
       internal static let count = L10n.tr("Localizable", "settings.virtual_machine.count", fallback: "Number of Machines")
       /// Headless/No Graphics
       internal static let headless = L10n.tr("Localizable", "settings.virtual_machine.headless", fallback: "Headless/No Graphics")
+      /// Network Bridged Adapter
+      internal static let netBridgedAdapter = L10n.tr("Localizable", "settings.virtual_machine.netBridgedAdapter", fallback: "Network Bridged Adapter")
       /// Use the Tart CLI to create a virtual machine.
       internal static let noVirtualMachinesAvailable = L10n.tr("Localizable", "settings.virtual_machine.no_virtual_machines_available", fallback: "Use the Tart CLI to create a virtual machine.")
       /// SSH
@@ -163,8 +165,6 @@ internal enum L10n {
     internal enum Webhook {
       /// Allow Insecure Image Pulls
       internal static let insecurePulls = L10n.tr("Localizable", "settings.webhook.insecurePulls", fallback: "Allow Insecure Image Pulls")
-      /// Network Bridged Adapter
-      internal static let netBridgedAdapter = L10n.tr("Localizable", "settings.webhook.netBridgedAdapter", fallback: "Network Bridged Adapter")
       /// Webhook Port
       internal static let port = L10n.tr("Localizable", "settings.webhook.port", fallback: "Webhook Port")
       internal enum Port {
