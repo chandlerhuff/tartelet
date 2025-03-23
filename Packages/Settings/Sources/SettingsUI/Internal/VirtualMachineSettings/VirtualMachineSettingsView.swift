@@ -38,7 +38,7 @@ struct VirtualMachineSettingsView<SettingsStoreType: SettingsStore & Observable>
                     Text(L10n.Settings.VirtualMachine.headless)
                 }
                 .disabled(!isSettingsEnabled)
-                TextField(L10n.Settings.Webhook.netBridgedAdapter, text: $netBridgedAdapter)
+                TextField(L10n.Settings.VirtualMachine.netBridgedAdapter, text: $netBridgedAdapter)
                     .disabled(!isSettingsEnabled)
             }
             Section {
