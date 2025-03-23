@@ -71,11 +71,16 @@ guard let webhookPort = environment.webhookPort else {
     exit(1)
 }
 
-try await Composers.fleetWebhook.startCommandLine(
-    numberOfMachines: environment.numberOfMachines,
-    gitHubRunnerLabels: environment.runnerLabels,
-    webhookPort: webhookPort,
-    isInsecure: environment.isInsecure,
-    isHeadless: environment.isHeadless,
-    netBridgedAdapter: environment.netBridgedAdapter
-)
+Task {
+    try await Composers.fleetWebhook.startCommandLine(
+        numberOfMachines: environment.numberOfMachines,
+        gitHubRunnerLabels: environment.runnerLabels,
+        webhookPort: webhookPort,
+        isInsecure: environment.isInsecure,
+        isHeadless: environment.isHeadless,
+        insecureDomains: environment.insecureDomains,
+        netBridgedAdapter: environment.netBridgedAdapter
+    )
+}
+
+RunLoop.main.run()

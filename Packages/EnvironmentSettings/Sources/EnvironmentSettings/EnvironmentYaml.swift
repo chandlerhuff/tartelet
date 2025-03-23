@@ -1,3 +1,5 @@
+import GitHubDomain
+
 // swiftlint:disable nesting
 struct EnvironmentYaml: Decodable {
     struct Tart: Decodable {
@@ -6,16 +8,19 @@ struct EnvironmentYaml: Decodable {
             let password: String
         }
 
-        let homeFolder: String
+        let homeFolder: String?
         let netBridgedAdapter: String?
         let isHeadless: Bool?
         let isInsecure: Bool?
+        let insecureDomains: [String]?
         let numberOfVirtualMachines: Int?
         let ssh: SSH?
     }
     struct Github: Decodable {
         let runnerScope: GitHubRunnerScope
         let organizationName: String?
+        let ownerName: String?
+        let repositoryName: String?
         let appId: String
         let privateKey: String
     }

@@ -3,7 +3,7 @@ import LoggingDomain
 
 public final class ConsoleLogger: LoggingDomain.Logger {
     private let subsystem: String
-    
+
     public init(subsystem: String) {
         self.subsystem = subsystem
     }

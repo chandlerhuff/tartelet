@@ -5,6 +5,8 @@ excluded:
   - Packages/Settings/Sources/SettingsUI/Internal/L10n.swift
   - "**/.build"
   - "**/.index-build"
+disabled_rules:
+  - line_length
 opt_in_rules:
   - anonymous_argument_in_multiline_closure
   - array_init

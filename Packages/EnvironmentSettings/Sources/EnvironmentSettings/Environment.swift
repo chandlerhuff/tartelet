@@ -17,13 +17,14 @@ public final class Environment: TartHomeProvider,
     public var password: String?
     public var runnerDisableUpdates = false
     public var runnerScope: GitHubRunnerScope = .organization
-    public var runnerLabels: String = "test"
+    public var runnerLabels: String = ""
     public var runnerGroup: String = ""
     public var homeFolderURL: URL?
     public var numberOfMachines = 1
     public var netBridgedAdapter: String?
     public var isHeadless = false
     public var isInsecure = false
+    public var insecureDomains: [String]
     public var webhookPort: Int?
 
     public init() throws {
@@ -32,6 +33,9 @@ public final class Environment: TartHomeProvider,
         let environmentYaml = try YAMLDecoder().decode(EnvironmentYaml.self, from: contents)
 
         organizationName = environmentYaml.github.organizationName
+        repositoryName = environmentYaml.github.repositoryName
+        ownerName = environmentYaml.github.ownerName
+        appId = environmentYaml.github.appId
         privateKey = try Data(contentsOf: URL(fileURLWithPath: environmentYaml.github.privateKey))
         username = environmentYaml.tart.ssh?.username
         password = environmentYaml.tart.ssh?.password
@@ -39,11 +43,12 @@ public final class Environment: TartHomeProvider,
         runnerScope = environmentYaml.github.runnerScope
         runnerLabels = environmentYaml.runner.labels
         runnerGroup = environmentYaml.runner.group ?? ""
-        homeFolderURL = URL(fileURLWithPath: environmentYaml.tart.homeFolder)
+        homeFolderURL = environmentYaml.tart.homeFolder.map { URL(fileURLWithPath: $0) }
         numberOfMachines = environmentYaml.tart.numberOfVirtualMachines ?? 1
         netBridgedAdapter = environmentYaml.tart.netBridgedAdapter
         isHeadless = environmentYaml.tart.isHeadless ?? false
         isInsecure = environmentYaml.tart.isInsecure ?? false
+        insecureDomains = environmentYaml.tart.insecureDomains ?? []
         webhookPort = environmentYaml.webhook.port
     }
 

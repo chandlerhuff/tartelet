@@ -13,11 +13,11 @@ public final class VirtualMachineFleetWebhook {
 
     private let logger: Logger
     private let webhookServer: WebhookServer
-    private let virtualMachineProvider: VirtualMachineProvider
     private var webhookServerTask: Task<(), any Error>?
-    private var activeTasks: [WorkflowJob: Task<(), Never>] = [:]
-    private var numberOfMachines = 0
-    private var gitHubRunnerLabels: String?
+    private let jobHandler: JobHandler
+    private var numberOfMachines = 1
+    private var gitHubRunnerLabels: Set<String>?
+    private var insecureDomains: [String]?
     private var isInsecure = false
     private var isHeadless = false
     private var netBridgedAdapter: String?
@@ -26,7 +26,7 @@ public final class VirtualMachineFleetWebhook {
     public init(logger: Logger, webhookServer: WebhookServer, virtualMachineProvider: VirtualMachineProvider) {
         self.logger = logger
         self.webhookServer = webhookServer
-        self.virtualMachineProvider = virtualMachineProvider
+        jobHandler = .init(virtualMachineProvider: virtualMachineProvider, logger: logger)
 
         webhookServer.workflowJobPublisher
             .receive(on: DispatchQueue.main)
@@ -35,7 +35,7 @@ public final class VirtualMachineFleetWebhook {
                     guard let self, await isStarted else {
                         return
                     }
-                    handleWorkflowJob(workflowJob)
+                    await handleWorkflowJob(workflowJob)
                 }
             }
             .store(in: &cancellables)
@@ -62,10 +62,17 @@ public final class VirtualMachineFleetWebhook {
             return
         }
         self.numberOfMachines = numberOfMachines
-        self.gitHubRunnerLabels = gitHubRunnerLabels
+        Task {
+            await jobHandler.set(numberOfMachines: numberOfMachines)
+        }
+
+        let labelsArray = gitHubRunnerLabels.components(separatedBy: ",").map { label in
+            label.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        self.gitHubRunnerLabels = Set<String>(labelsArray)
 
         webhookServerTask = Task { [webhookServer] in
-            logger.info("Starting web server on port: \(webhookPort)")
+            logger.info("Starting web server on port: \(webhookPort) numberOfMachines: \(numberOfMachines)")
             try await webhookServer.run(port: webhookPort)
             isStarted = false
         }
@@ -79,27 +86,39 @@ public final class VirtualMachineFleetWebhook {
         webhookPort: Int,
         isInsecure: Bool,
         isHeadless: Bool,
+        insecureDomains: [String],
         netBridgedAdapter: String?
     ) async throws {
         self.isInsecure = isInsecure
         self.isHeadless = isHeadless
+        self.insecureDomains = insecureDomains
         self.netBridgedAdapter = netBridgedAdapter
         self.numberOfMachines = numberOfMachines
-        self.gitHubRunnerLabels = gitHubRunnerLabels
-        
-        logger.info("Starting web server on port: \(webhookPort)")
+        Task {
+            await jobHandler.set(numberOfMachines: numberOfMachines)
+        }
+
+        let labelsArray = gitHubRunnerLabels.components(separatedBy: ",").map { label in
+            label.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        self.gitHubRunnerLabels = Set<String>(labelsArray)
+
+        logger.info("Starting web server on port: \(webhookPort) numberOfMachines: \(numberOfMachines)")
+        Task { @MainActor in
+            isStarted = true
+        }
         try await webhookServer.run(port: webhookPort)
     }
 
     @MainActor
     public func stopImmediately() {
+        logger.info("Stop webhook immediately")
         isStarted = false
         isStopping = false
         webhookServerTask?.cancel()
-        for (_, task) in activeTasks {
-            task.cancel()
+        Task {
+            await jobHandler.cancelAll()
         }
-        activeTasks = [:]
     }
 
     @MainActor
@@ -107,10 +126,12 @@ public final class VirtualMachineFleetWebhook {
         guard isStarted else {
             return
         }
+        logger.info("Stop webhook")
         isStopping = true
         Task {
             await webhookServer.stop()
             webhookServerTask?.cancel()
+            await jobHandler.cancelAll()
             isStopping = false
             isStarted = false
         }
@@ -118,68 +139,49 @@ public final class VirtualMachineFleetWebhook {
 }
 
 private extension VirtualMachineFleetWebhook {
-    func handleWorkflowJob(_ workflowJob: WorkflowJob) {
-        guard let gitHubRunnerLabels,
-              workflowJob.labels.contains(gitHubRunnerLabels),
-              workflowJob.labels.count == 2,
-              workflowJob.action == .queued,
-              let imageName = workflowJob.labels.first(where: { $0 != gitHubRunnerLabels }) else {
+    func handleWorkflowJob(_ workflowJob: WorkflowJob) async {
+        guard let gitHubRunnerLabels else {
+            logger.error("Workflow job skipped no runner labels set.")
             return
         }
-        let runnerLabels = workflowJob.labels.joined(separator: ",")
-        let count = activeTasks.count
-        let task = Task {
-            do {
-                let virtualMachine = try await virtualMachineProvider.createVirtualMachine(
-                    imageName: imageName,
-                    name: "tartelet-temp-\(count + 1)",
-                    runnerLabels: runnerLabels,
-                    isInsecure: isInsecure
-                )
-                try await runVirtualMachine(virtualMachine, netBridgedAdapter: netBridgedAdapter)
-                activeTasks.removeValue(forKey: workflowJob)
-            } catch {
-                logger.error(error.localizedDescription)
-                activeTasks.removeValue(forKey: workflowJob)
-            }
-        }
-        activeTasks[workflowJob]?.cancel()
-        activeTasks[workflowJob] = task
-    }
 
-    func runVirtualMachine(_ virtualMachine: VirtualMachine, netBridgedAdapter: String?) async throws {
-        try await withTaskCancellationHandler {
-            logger.info("Start virtual machine named \(virtualMachine.name)")
-            do {
-                try await virtualMachine.start(netBridgedAdapter: netBridgedAdapter, isHeadless: isHeadless)
-                logger.info("Did stop virtual machine named \(virtualMachine.name)")
-                do {
-                    try await virtualMachine.delete()
-                    logger.info("Did delete virtual machine named \(virtualMachine.name)")
-                } catch {
-                    logger.info("Could not delete virtual machine named \(virtualMachine.name)")
-                    throw error
-                }
-            } catch {
-                logger.info(
-                    "Virtual machine named \(virtualMachine.name) stopped with message: "
-                    + error.localizedDescription
-                )
-                throw error
-            }
-        } onCancel: {
-            Task.detached(priority: .high) {
-                self.logger.info("Stop virtual machine named \(virtualMachine.name)")
-                do {
-                    try await virtualMachine.delete()
-                } catch {
-                    self.logger.info(
-                        "Could not delete virtual machine named \(virtualMachine.name): "
-                        + error.localizedDescription
-                    )
-                    throw error
-                }
-            }
+        guard gitHubRunnerLabels.isSubset(of: workflowJob.labels) else {
+            logger.error("Workflow job skipped because of labels. Job labels: \(workflowJob.labels) Tart labels: \(gitHubRunnerLabels)")
+            return
         }
+
+        let imageNameSet = workflowJob.labels.subtracting(gitHubRunnerLabels)
+
+        guard imageNameSet.count == 1, let imageName = imageNameSet.first else {
+            logger.error("Workflow job skipped extra labels found: \(imageNameSet)")
+            return
+        }
+
+        let imageInsecure = insecureDomains?.contains { insecureDomain in
+            imageName.contains(insecureDomain)
+        } ?? false
+
+        let isJobInsecure = isInsecure || imageInsecure
+
+        logger.info("Workflow job: \(workflowJob.id) action: \(workflowJob.action.rawValue) image: \(imageName) isInsecure: \(isJobInsecure)")
+
+        switch workflowJob.action {
+        case .waiting:
+            await jobHandler.cancel(workflowJob: workflowJob)
+        case .queued:
+            let pendingJob = PendingJob(
+                workflowJob: workflowJob,
+                imageName: imageName,
+                netBridgedAdapter: netBridgedAdapter,
+                isInsecure: isJobInsecure,
+                isHeadless: isHeadless
+            )
+            await jobHandler.add(pendingJob: pendingJob)
+        case .inProgress, .unknown:
+            break
+        case .completed:
+            await jobHandler.cancel(workflowJob: workflowJob)
+        }
+
     }
 }

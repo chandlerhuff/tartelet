@@ -6,7 +6,7 @@ import GitHubDomain
 public struct WorkflowJob: Codable, Identifiable, Hashable {
     public let id: Int
     public let action: WorkflowAction
-    public let labels: [String]
+    public let labels: Set<String>
 
     public func hash(into hasher: inout Hasher) {
         hasher.combine(id)
@@ -14,7 +14,9 @@ public struct WorkflowJob: Codable, Identifiable, Hashable {
 }
 
 public enum WorkflowAction: String {
+    case waiting
     case queued
+    case inProgress = "in_progress"
     case completed
     case unknown
 }
@@ -28,7 +30,7 @@ extension WorkflowAction: Codable {
 struct WebhookResponse: Codable {
     struct WorkflowJobResponse: Codable, Identifiable {
         let id: Int
-        let labels: [String]
+        let labels: Set<String>
     }
 
     let action: WorkflowAction
