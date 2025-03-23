@@ -5,6 +5,8 @@ public protocol VirtualMachineProvider: AnyObject {
         imageName: String,
         name: String,
         runnerLabels: String?,
-        isInsecure: Bool
+        isInsecure: Bool,
+        memory: String?,
+        cpu: String?
     ) async throws -> VirtualMachine
 }

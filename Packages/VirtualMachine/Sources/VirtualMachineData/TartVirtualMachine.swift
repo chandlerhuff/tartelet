@@ -28,6 +28,14 @@ public final class TartVirtualMachine: VirtualMachine {
         return TartVirtualMachine(tart: tart, vmName: newName, runnerLabels: runnerLabels)
     }
 
+    public func setMemory(_ memory: String) async throws {
+        try await tart.setMemory(name: name, memory: memory)
+    }
+
+    public func setCpu(_ cpu: String) async throws {
+        try await tart.setCpu(name: name, cpu: cpu)
+    }
+
     public func delete() async throws {
         try await tart.delete(name: name)
     }

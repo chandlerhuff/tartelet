@@ -7,6 +7,7 @@ excluded:
   - "**/.index-build"
 disabled_rules:
   - line_length
+  - function_parameter_count
 opt_in_rules:
   - anonymous_argument_in_multiline_closure
   - array_init

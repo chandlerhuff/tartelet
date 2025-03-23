@@ -23,6 +23,16 @@ public final class Tart {
         try await executeCommand(withArguments: arguments)
     }
 
+    public func setMemory(name: String, memory: String) async throws {
+        let arguments: [String] = ["set", name, "--memory=\(memory)"]
+        try await executeCommand(withArguments: arguments)
+    }
+
+    public func setCpu(name: String, cpu: String) async throws {
+        let arguments: [String] = ["set", name, "--cpu=\(cpu)"]
+        try await executeCommand(withArguments: arguments)
+    }
+
     public func clone(sourceName: String, newName: String, isInsecure: Bool) async throws {
         var arguments: [String] = ["clone", sourceName, newName]
         if isInsecure {
@@ -43,6 +53,7 @@ public final class Tart {
     }
 
     public func delete(name: String) async throws {
+        _ = try? await executeCommand(withArguments: ["stop", name])
         try await executeCommand(withArguments: ["delete", name])
     }
 

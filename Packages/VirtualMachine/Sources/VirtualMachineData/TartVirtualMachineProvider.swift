@@ -20,7 +20,9 @@ extension TartVirtualMachineProvider: VirtualMachineProvider {
         imageName: String,
         name: String,
         runnerLabels: String?,
-        isInsecure: Bool
+        isInsecure: Bool,
+        memory: String?,
+        cpu: String?
     ) async throws -> any VirtualMachine {
         try await tart.pull(sourceName: imageName, isInsecure: isInsecure)
         let virtualMachine = try await TartVirtualMachine(
@@ -28,6 +30,12 @@ extension TartVirtualMachineProvider: VirtualMachineProvider {
             vmName: imageName,
             runnerLabels: runnerLabels
         ).clone(named: name, isInsecure: isInsecure)
+        if let memory {
+            try await virtualMachine.setMemory(memory)
+        }
+        if let cpu {
+            try await virtualMachine.setCpu(cpu)
+        }
         let connectingVirutalMachine = SSHConnectingVirtualMachine(
             logger: logger,
             virtualMachine: virtualMachine,

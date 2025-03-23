@@ -101,6 +101,14 @@ public final class SSHConnectingVirtualMachine<SSHClientType: SSHClient>: Virtua
         )
     }
 
+    public func setMemory(_ memory: String) async throws {
+        try await virtualMachine.setMemory(memory)
+    }
+
+    public func setCpu(_ cpu: String) async throws {
+        try await virtualMachine.setCpu(cpu)
+    }
+
     public func delete() async throws {
         try await virtualMachine.delete()
     }

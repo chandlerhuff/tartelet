@@ -42,7 +42,6 @@ public final class VirtualMachineFleetWebhook {
     }
 
     @MainActor
-    // swiftlint:disable:next function_parameter_count
     public func start(
         numberOfMachines: Int,
         gitHubRunnerLabels: String,
@@ -79,7 +78,6 @@ public final class VirtualMachineFleetWebhook {
         isStarted = true
     }
 
-    // swiftlint:disable:next function_parameter_count
     public func startCommandLine(
         numberOfMachines: Int,
         gitHubRunnerLabels: String,
@@ -150,7 +148,27 @@ private extension VirtualMachineFleetWebhook {
             return
         }
 
-        let imageNameSet = workflowJob.labels.subtracting(gitHubRunnerLabels)
+        let workflowSet = workflowJob.labels.subtracting(gitHubRunnerLabels)
+
+        let memoryLabels = workflowSet.filter { label in
+            label.starts(with: "memory:")
+        }
+        guard memoryLabels.count <= 1 else {
+            logger.error("Workflow job skipped extra memory labels found: \(memoryLabels)")
+            return
+        }
+        let memoryLabel = memoryLabels.first?.components(separatedBy: ":").last
+
+        let cpuLabels = workflowSet.filter { label in
+            label.starts(with: "cpu:")
+        }
+        guard cpuLabels.count <= 1 else {
+            logger.error("Workflow job skipped extra cpu labels found: \(memoryLabels)")
+            return
+        }
+        let cpuLabel = cpuLabels.first?.components(separatedBy: ":").last
+
+        let imageNameSet = workflowSet.subtracting(memoryLabels).subtracting(cpuLabels)
 
         guard imageNameSet.count == 1, let imageName = imageNameSet.first else {
             logger.error("Workflow job skipped extra labels found: \(imageNameSet)")
@@ -172,7 +190,9 @@ private extension VirtualMachineFleetWebhook {
                 imageName: imageName,
                 netBridgedAdapter: netBridgedAdapter,
                 isInsecure: isJobInsecure,
-                isHeadless: isHeadless
+                isHeadless: isHeadless,
+                memory: memoryLabel,
+                cpu: cpuLabel
             )
             await jobHandler.add(pendingJob: pendingJob)
         case .waiting, .inProgress, .completed, .unknown:

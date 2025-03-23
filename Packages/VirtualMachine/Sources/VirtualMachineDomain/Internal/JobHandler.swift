@@ -47,7 +47,9 @@ actor JobHandler {
                     imageName: pendingJob.imageName,
                     name: "tartelet-temp-\(pendingJob.workflowJob.id)",
                     runnerLabels: runnerLabels,
-                    isInsecure: pendingJob.isInsecure
+                    isInsecure: pendingJob.isInsecure,
+                    memory: pendingJob.memory,
+                    cpu: pendingJob.cpu
                 )
                 try await runVirtualMachine(
                     virtualMachine,

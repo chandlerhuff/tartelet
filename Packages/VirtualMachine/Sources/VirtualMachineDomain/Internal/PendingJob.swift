@@ -7,4 +7,6 @@ struct PendingJob {
     let netBridgedAdapter: String?
     let isInsecure: Bool
     let isHeadless: Bool
+    let memory: String?
+    let cpu: String?
 }
