@@ -36,6 +36,14 @@ struct SettingsVirtualMachine<SettingsStoreType: SettingsStore>: VirtualMachineD
         try await virtualMachine.clone(named: newName, isInsecure: isInsecure)
     }
 
+    func setMemory(_ memory: String) async throws {
+        try await virtualMachine.setMemory(memory)
+    }
+
+    func setCpu(_ cpu: String) async throws {
+        try await virtualMachine.setCpu(cpu)
+    }
+
     func delete() async throws {
         try await virtualMachine.delete()
     }
