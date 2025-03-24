@@ -33,23 +33,26 @@ actor JobHandler {
         case .queued:
             logger.info("Pending job added: \(pendingJob.id)")
             pendingJobs[pendingJob.id] = pendingJob
-            webhookServer.pendingJobs = pendingJobs.count
 
+            updateStats()
             if activeJobs.count < numberOfMachines {
                 start(pendingJob: pendingJob)
             }
         case .inProgress:
             logger.info("In progress job added: \(pendingJob.id)")
-            pendingJobs.removeValue(forKey: pendingJob.id)
+            let oldJob = pendingJobs.removeValue(forKey: pendingJob.id)
+            if let oldJob, !oldJob.didStart {
+                pendingJobs.values.first { existingJob in
+                    existingJob.workflowJob.labels == pendingJob.workflowJob.labels && existingJob.didStart
+                }?.didStart = false
+            }
             inProgressJobs[pendingJob.id] = pendingJob
-            webhookServer.pendingJobs = pendingJobs.count
-            webhookServer.inProgressJobs = inProgressJobs.count
+            updateStats()
         case .completed:
             logger.info("Completed job added: \(pendingJob.id)")
             inProgressJobs.removeValue(forKey: pendingJob.id)
             guard pendingJobs[pendingJob.id] != nil else {
-                webhookServer.pendingJobs = pendingJobs.count
-                webhookServer.inProgressJobs = inProgressJobs.count
+                updateStats()
                 return
             }
             pendingJobs.removeValue(forKey: pendingJob.id)
@@ -71,11 +74,10 @@ actor JobHandler {
                 }
             } else if otherInProgress <= running {
                 pendingJobs.values.first { existingJob in
-                    existingJob.workflowJob.labels == pendingJob.workflowJob.labels
+                    existingJob.workflowJob.labels == pendingJob.workflowJob.labels && !existingJob.didStart
                 }?.didStart = true
             }
-            webhookServer.pendingJobs = pendingJobs.count
-            webhookServer.inProgressJobs = inProgressJobs.count
+            updateStats()
         case .unknown:
             logger.info("Unknown job added: \(pendingJob.id)")
         }
@@ -146,14 +148,21 @@ actor JobHandler {
 
         activeJobs[uuid]?.task.cancel()
         activeJobs[uuid] = .init(labels: pendingJob.workflowJob.labels, task: task)
-        webhookServer.virtualMachines = activeJobs.count
+        updateStats()
     }
 
     private func remove(uuid: UUID) {
         activeJobs.removeValue(forKey: uuid)
-        webhookServer.virtualMachines = activeJobs.count
+        updateStats()
         if activeJobs.count < numberOfMachines, let pendingJob = pendingJobs.first(where: { !$0.value.didStart })?.value {
             start(pendingJob: pendingJob)
         }
+    }
+
+    private func updateStats() {
+        webhookServer.pendingJobs = pendingJobs.count
+        webhookServer.inProgressJobs = inProgressJobs.count
+        webhookServer.startedPendingJobs = pendingJobs.filter { $1.didStart }.count
+        webhookServer.virtualMachines = activeJobs.count
     }
 }

@@ -44,6 +44,7 @@ public final class WebhookServer {
 
     public var inProgressJobs = 0
     public var pendingJobs = 0
+    public var startedPendingJobs = 0
     public var virtualMachines = 0
 
     public var workflowJobPublisher: AnyPublisher<WorkflowJob, Never> {
@@ -77,7 +78,7 @@ public final class WebhookServer {
             guard let self else {
                 return .init(statusCode: .badGateway)
             }
-            let string = "tart_executor_in_progress_jobs \(inProgressJobs)\ntart_executor_pending_jobs \(pendingJobs)\ntart_executor_virtual_machines \(virtualMachines)"
+            let string = "tart_executor_in_progress_jobs \(inProgressJobs)\ntart_executor_pending_jobs \(pendingJobs)\ntart_executor_started_pending_jobs \(startedPendingJobs)\ntart_executor_virtual_machines \(virtualMachines)"
             let data = Data(string.utf8)
             return .init( statusCode: .ok, body: data)
         }
