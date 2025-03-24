@@ -66,9 +66,6 @@ actor JobHandler {
     }
 
     private func start(pendingJob: PendingJob) {
-        func runVirtualMachine(_ virtualMachine: VirtualMachine, netBridgedAdapter: String?, isHeadless: Bool) async throws {
-        }
-
         logger.info("Starting job: \(pendingJob.workflowJob.id)")
         pendingJob.didStart = true
         let runnerLabels = pendingJob.workflowJob.labels.joined(separator: ",")
