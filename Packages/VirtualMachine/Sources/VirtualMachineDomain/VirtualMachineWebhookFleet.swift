@@ -182,21 +182,16 @@ private extension VirtualMachineFleetWebhook {
         let isJobInsecure = isInsecure || imageInsecure
 
         logger.info("Workflow job: \(workflowJob.id) action: \(workflowJob.action.rawValue) image: \(imageName) isInsecure: \(isJobInsecure)")
-
-        switch workflowJob.action {
-        case .queued:
-            let pendingJob = PendingJob(
-                workflowJob: workflowJob,
-                imageName: imageName,
-                netBridgedAdapter: netBridgedAdapter,
-                isInsecure: isJobInsecure,
-                isHeadless: isHeadless,
-                memory: memoryLabel,
-                cpu: cpuLabel
-            )
-            await jobHandler.add(pendingJob: pendingJob)
-        case .waiting, .inProgress, .completed, .unknown:
-            break
-        }
+        
+        let pendingJob = PendingJob(
+            workflowJob: workflowJob,
+            imageName: imageName,
+            netBridgedAdapter: netBridgedAdapter,
+            isInsecure: isJobInsecure,
+            isHeadless: isHeadless,
+            memory: memoryLabel,
+            cpu: cpuLabel
+        )
+        await jobHandler.handle(pendingJob: pendingJob)
     }
 }
