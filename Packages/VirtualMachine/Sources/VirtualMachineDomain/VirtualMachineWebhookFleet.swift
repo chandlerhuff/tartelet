@@ -26,7 +26,11 @@ public final class VirtualMachineFleetWebhook {
     public init(logger: Logger, webhookServer: WebhookServer, virtualMachineProvider: VirtualMachineProvider) {
         self.logger = logger
         self.webhookServer = webhookServer
-        jobHandler = .init(virtualMachineProvider: virtualMachineProvider, logger: logger)
+        jobHandler = .init(
+            virtualMachineProvider: virtualMachineProvider,
+            webhookServer: webhookServer,
+            logger: logger
+        )
 
         webhookServer.workflowJobPublisher
             .receive(on: DispatchQueue.main)
@@ -182,7 +186,7 @@ private extension VirtualMachineFleetWebhook {
         let isJobInsecure = isInsecure || imageInsecure
 
         logger.info("Workflow job: \(workflowJob.id) action: \(workflowJob.action.rawValue) image: \(imageName) isInsecure: \(isJobInsecure)")
-        
+
         let pendingJob = PendingJob(
             workflowJob: workflowJob,
             imageName: imageName,

@@ -10,12 +10,15 @@ struct ActiveJob {
 actor JobHandler {
     private var numberOfMachines = 1
     private var activeJobs = [UUID: ActiveJob]()
+    private var inProgressJobs = [Int: PendingJob]()
     private var pendingJobs = [Int: PendingJob]()
     private nonisolated let virtualMachineProvider: VirtualMachineProvider
+    private nonisolated let webhookServer: WebhookServer
     private nonisolated let logger: Logger
 
-    init(virtualMachineProvider: VirtualMachineProvider, logger: Logger) {
+    init(virtualMachineProvider: VirtualMachineProvider, webhookServer: WebhookServer, logger: Logger) {
         self.virtualMachineProvider = virtualMachineProvider
+        self.webhookServer = webhookServer
         self.logger = logger
     }
 
@@ -30,19 +33,30 @@ actor JobHandler {
         case .queued:
             logger.info("Pending job added: \(pendingJob.id)")
             pendingJobs[pendingJob.id] = pendingJob
+            webhookServer.pendingJobs = pendingJobs.count
 
             if activeJobs.count < numberOfMachines {
                 start(pendingJob: pendingJob)
             }
         case .inProgress:
             pendingJobs.removeValue(forKey: pendingJob.id)
+            inProgressJobs[pendingJob.id] = pendingJob
+            webhookServer.pendingJobs = pendingJobs.count
+            webhookServer.inProgressJobs = inProgressJobs.count
         case .completed:
+            inProgressJobs.removeValue(forKey: pendingJob.id)
             guard pendingJobs[pendingJob.id] != nil else {
                 return
             }
             pendingJobs.removeValue(forKey: pendingJob.id)
             let otherPending = pendingJobs.values.filter { existingJob in
                 existingJob.workflowJob.labels == pendingJob.workflowJob.labels
+            }.count
+            let otherInProgress = inProgressJobs.values.filter { existingJob in
+                existingJob.workflowJob.labels == pendingJob.workflowJob.labels
+            }.count
+            let running = activeJobs.values.filter { activeJob in
+                activeJob.labels == pendingJob.workflowJob.labels
             }.count
             if otherPending == 0 {
                 activeJobs.forEach { _, activeJob in
@@ -51,11 +65,13 @@ actor JobHandler {
                     }
                     activeJob.task.cancel()
                 }
-            } else {
+            } else if otherInProgress <= running {
                 pendingJobs.values.first { existingJob in
                     existingJob.workflowJob.labels == pendingJob.workflowJob.labels
                 }?.didStart = true
             }
+            webhookServer.pendingJobs = pendingJobs.count
+            webhookServer.inProgressJobs = inProgressJobs.count
         }
     }
 
@@ -124,10 +140,12 @@ actor JobHandler {
 
         activeJobs[uuid]?.task.cancel()
         activeJobs[uuid] = .init(labels: pendingJob.workflowJob.labels, task: task)
+        webhookServer.virtualMachines = activeJobs.count
     }
 
     private func remove(uuid: UUID) {
         activeJobs.removeValue(forKey: uuid)
+        webhookServer.virtualMachines = activeJobs.count
         if activeJobs.count < numberOfMachines, let pendingJob = pendingJobs.first(where: { !$0.value.didStart })?.value {
             start(pendingJob: pendingJob)
         }
