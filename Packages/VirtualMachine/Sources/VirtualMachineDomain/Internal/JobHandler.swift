@@ -28,8 +28,8 @@ actor JobHandler {
 
     func handle(pendingJob: PendingJob) {
         switch pendingJob.action {
-        case .waiting, .unknown:
-            break
+        case .waiting:
+            logger.info("Waiting job added: \(pendingJob.id)")
         case .queued:
             logger.info("Pending job added: \(pendingJob.id)")
             pendingJobs[pendingJob.id] = pendingJob
@@ -39,13 +39,17 @@ actor JobHandler {
                 start(pendingJob: pendingJob)
             }
         case .inProgress:
+            logger.info("In progress job added: \(pendingJob.id)")
             pendingJobs.removeValue(forKey: pendingJob.id)
             inProgressJobs[pendingJob.id] = pendingJob
             webhookServer.pendingJobs = pendingJobs.count
             webhookServer.inProgressJobs = inProgressJobs.count
         case .completed:
+            logger.info("Completed job added: \(pendingJob.id)")
             inProgressJobs.removeValue(forKey: pendingJob.id)
             guard pendingJobs[pendingJob.id] != nil else {
+                webhookServer.pendingJobs = pendingJobs.count
+                webhookServer.inProgressJobs = inProgressJobs.count
                 return
             }
             pendingJobs.removeValue(forKey: pendingJob.id)
@@ -58,7 +62,7 @@ actor JobHandler {
             let running = activeJobs.values.filter { activeJob in
                 activeJob.labels == pendingJob.workflowJob.labels
             }.count
-            if otherPending == 0 {
+            if otherPending == 0, otherInProgress == 0 {
                 activeJobs.forEach { _, activeJob in
                     guard activeJob.labels == pendingJob.workflowJob.labels else {
                         return
@@ -72,6 +76,8 @@ actor JobHandler {
             }
             webhookServer.pendingJobs = pendingJobs.count
             webhookServer.inProgressJobs = inProgressJobs.count
+        case .unknown:
+            logger.info("Unknown job added: \(pendingJob.id)")
         }
     }
 
